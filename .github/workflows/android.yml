@@ -1,0 +1,25 @@
+name: Android APK
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo6 cmake libffi-dev libssl-dev automake
+          python3 -m pip install --user --upgrade pip
+          python3 -m pip install --user 'cython==0.29.34' 'buildozer==1.5.0' setuptools
+      - name: Build APK
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          yes | buildozer android debug
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: HIT-Training-APK
+          path: bin/*.apk
